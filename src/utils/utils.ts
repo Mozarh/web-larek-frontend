@@ -94,7 +94,7 @@ export function getElementData<T extends Record<string, unknown>>(el: HTMLElemen
  */
 export function isPlainObject(obj: unknown): obj is object {
     const prototype = Object.getPrototypeOf(obj);
-    return  prototype === Object.getPrototypeOf({}) ||
+    return prototype === Object.getPrototypeOf({}) ||
         prototype === null;
 }
 
@@ -109,10 +109,10 @@ export function isBoolean(v: unknown): v is boolean {
  */
 export function createElement<
     T extends HTMLElement
-    >(
+>(
     tagName: keyof HTMLElementTagNameMap,
     props?: Partial<Record<keyof T, string | boolean | object>>,
-    children?: HTMLElement | HTMLElement []
+    children?: HTMLElement | HTMLElement[]
 ): T {
     const element = document.createElement(tagName) as T;
     if (props) {
@@ -132,4 +132,11 @@ export function createElement<
         }
     }
     return element;
+}
+
+export function handlePrice(price: number): string {
+    const priceStr = price.toString();
+    return priceStr.length < 5
+        ? priceStr
+        : priceStr.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 }
