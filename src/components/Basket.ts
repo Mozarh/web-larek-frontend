@@ -1,7 +1,7 @@
-import { IProduct } from "../../types";
-import { handlePrice } from "../../utils/utils";
-import { Component } from "../base/Component";
-import { EventEmitter } from "../base/events";
+import { IProduct } from "../types";
+import { handlePrice } from "../utils/utils";
+import { Component } from "./base/Component";
+import { EventEmitter } from "./base/events";
 
 interface IBasketView {
     items: HTMLElement[];
@@ -29,28 +29,32 @@ export class Basket extends Component<IBasketView> {
 
     set list(items: HTMLElement[]) {
         this._items.replaceChildren(...items);
-        this._button.disabled = items.length ? false : true;
+        this.toggleButton(items.length === 0);
         this.refreshIndex();
     }
 
     set price(price: number) {
-        this._price.textContent = handlePrice(price) + ' ' + 'синапсов'
+        const formattedPrice = handlePrice(price) + ' синапсов'
+        this.setText(this._price, formattedPrice);
+    }
+
+    toggleButton(state: boolean) {
+        this.setDisabled(this._button, state);
     }
 
     disableButton() {
-        this._button.disabled = true;
+        this.toggleButton(true);
     }
 
     refreshIndex() {
         Array.from(this._items.children).forEach((item: HTMLElement, index: number) => {
             const indexElement = item.querySelector('.basket__item-index');
-            if (indexElement) {
-                indexElement.textContent = (index + 1).toString();
+            if (indexElement instanceof HTMLElement) {
+                this.setText(indexElement, (index + 1).toString())
             }
         });
     }
 }
-
 
 export interface IProductBasketItem extends IProduct {
     id: string,
@@ -88,14 +92,15 @@ export class CatalogItemBasket extends Component<IProductBasketItem> {
     }
 
     set title(value: string) {
-        this._title.textContent = value
+        this.setText(this._title, value)
     }
 
     set index(value: number) {
-        this._index.textContent = value.toString()
+        this.setText(this._index, value.toString())
     }
 
     set price(value: number) {
-        this._price.textContent = handlePrice(value) + ' ' + 'cинапсов'
+        const formattedValue = handlePrice(value) + ' синапсов'
+        this.setText(this._price, formattedValue)
     }
 }

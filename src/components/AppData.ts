@@ -75,12 +75,17 @@ export class AppState extends Model<IAppState> {
 
     validateContacts() {
         const errors: typeof this.formErrors = {};
-        if (!this.order.email) {
-            errors.email = 'Необходимо указать email';
+
+        const emailRegExp = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+        if (!this.order.email || !emailRegExp.test(this.order.email)) {
+            errors.email = 'Необходимо указать правильный email';
         }
-        if (!this.order.phone) {
-            errors.phone = 'Необходимо указать телефон';
+
+        const phoneRegExp = /^(\+7|8)?(\(?\d{3}\)?[\s\-]?)?(\d{3}[\s\-]?\d{2}[\s\-]?\d{2})$/;
+        if (!this.order.phone || !phoneRegExp.test(this.order.phone)) {
+            errors.phone = 'Необходимо указать правильный номер телефона';
         }
+
         this.formErrors = errors;
         this.events.emit('contactsFormErrors:change', this.formErrors);
         return Object.keys(errors).length === 0;

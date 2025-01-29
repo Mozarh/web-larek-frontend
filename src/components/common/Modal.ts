@@ -10,6 +10,16 @@ export class Modal extends Component<IModalData> {
     protected _closeButton: HTMLButtonElement;
     protected _content: HTMLElement;
 
+    _toggleModal(state: boolean = true) {
+        this.toggleClass(this.container, 'modal_active', state);
+    }
+
+    _handleEscape = (evt: KeyboardEvent) => {
+        if (evt.key === 'Escape') {
+            this.close();
+        }
+    }
+
     constructor(container: HTMLElement, protected events: IEvents) {
         super(container);
 
@@ -21,17 +31,23 @@ export class Modal extends Component<IModalData> {
         this._content.addEventListener('click', (event) => event.stopPropagation());
     }
 
-    set content(value: HTMLElement) {
-        this._content.replaceChildren(value);
+    set content(value: HTMLElement | null) {
+        if (value === null) {
+            this._content.replaceChildren();
+        } else {
+            this._content.replaceChildren(value);
+        }
     }
 
     open() {
-        this.container.classList.add('modal_active');
+        this._toggleModal();
+        document.addEventListener('keydown', this._handleEscape);
         this.events.emit('modal:open')
     }
 
     close() {
-        this.container.classList.remove('modal_active');
+        this._toggleModal(false);
+        document.removeEventListener('keydown', this._handleEscape);
         this.content = null;
         this.events.emit('modal:close');
     }

@@ -1,7 +1,7 @@
-import { ProductCategory } from "../../types";
-import { CDN_URL, comparisonCategory } from "../../utils/constants";
-import { ensureElement, handlePrice } from "../../utils/utils";
-import { Component } from "../base/Component";
+import { ProductCategory } from "../types";
+import { CDN_URL, comparisonCategory } from "../utils/constants";
+import { ensureElement, handlePrice } from "../utils/utils";
+import { Component } from "./base/Component";
 
 export interface ICardActions {
     onClick: (event: MouseEvent) => void;
@@ -43,6 +43,11 @@ export class Card extends Component<ICard> {
         }
     }
 
+
+    toggleButton(state: boolean) {
+        this.setDisabled(this._button, state);
+    }
+
     set id(value: string) {
         this.container.dataset.id = value;
     }
@@ -60,27 +65,28 @@ export class Card extends Component<ICard> {
     }
 
     set image(value: string) {
-        this._image.src = CDN_URL + value;
+        this.setImage(this._image, CDN_URL + value);
     }
 
     set selected(value: boolean) {
         if (!this._button.disabled) {
-            this._button.disabled = value;
+            this.toggleButton(value);
         }
     }
 
     set price(value: number | null) {
-        this._price.textContent = value
+        const formattedPrice = value
             ? handlePrice(value) + ' ' + 'cинапсов'
             : 'Бесценно';
+        this.setText(this._price, formattedPrice);
         if (this._button && !value) {
-            this._button.disabled = true
+            this.toggleButton(value === null);
         }
     }
 
     set category(value: ProductCategory) {
-        this._category.textContent = value;
-        this._category.classList.add(comparisonCategory[value])
+        this.setText(this._category, value)
+        this.toggleClass(this._category, comparisonCategory[value], true)
     }
 }
 
@@ -101,6 +107,6 @@ export class CatalogItemPreview extends Card {
     }
 
     set description(value: string) {
-        this._description.textContent = value
+        this.setText(this._description, value)
     }
 }

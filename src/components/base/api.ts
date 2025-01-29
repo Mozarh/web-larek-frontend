@@ -19,24 +19,23 @@ export class Api {
         };
     }
 
-    protected handleResponse(response: Response): Promise<object> {
+    protected handleResponse<T>(response: Response): Promise<T> {
         if (response.ok) return response.json();
         else return response.json()
             .then(data => Promise.reject(data.error ?? response.statusText));
     }
 
-    async get(uri: string) {
+    async get<T>(uri: string): Promise<T> {
         return fetch(this.baseUrl + uri, {
             ...this.options,
             method: 'GET'
-        }).then(this.handleResponse);
+        }).then(response => this.handleResponse<T>(response));
     }
 
-    async post(uri: string, data: object, method: ApiPostMethods = 'POST') {
+    async post<T>(uri: string, data: object, method: ApiPostMethods = 'POST'): Promise<T> {
         return fetch(this.baseUrl + uri, {
             ...this.options,
             method,
             body: JSON.stringify(data)
-        }).then(this.handleResponse);
-    }
-}
+        }).then(response => this.handleResponse<T>(response));
+    }}
